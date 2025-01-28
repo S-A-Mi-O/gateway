@@ -24,7 +24,7 @@ Authorization: Bearer {{token}}
 %}
 
 ### Update user
-PATCH http://localhost:8080/users
+PATCH http://localhost:8080/user-service/users
 Content-Type: application/json
 Authorization: Bearer {{token}}
 

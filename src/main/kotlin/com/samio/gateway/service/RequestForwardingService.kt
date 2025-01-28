@@ -6,10 +6,13 @@ import com.samio.gateway.eureka.EurekaPollingService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase
+import org.apache.hc.client5.http.impl.classic.HttpClients
+import org.apache.hc.core5.http.io.entity.StringEntity
 import org.springframework.cloud.client.discovery.DiscoveryClient
 import org.springframework.stereotype.Service
 import org.springframework.web.util.ContentCachingRequestWrapper
-import java.net.HttpURLConnection
+
 import java.net.URI
 import java.util.*
 
@@ -58,7 +61,7 @@ class RequestForwardingService(
             proxyRequest(request, response, forwardPath)
         } catch (e: Exception) {
             response.status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR
-            response.writer.write("Error proxying request: ${e.message}")
+            response.writer.write("b  Error proxying request: ${e.message}")
         }
     }
 
@@ -115,20 +118,23 @@ class RequestForwardingService(
         val wrappedRequest = request as? ContentCachingRequestWrapper
             ?: throw IllegalStateException("Request must be wrapped with ContentCachingRequestWrapper")
 
+            HttpClients.createDefault().use { client ->
+            val httpRequest = HttpUriRequestBase(request.method, URI.create(targetUrl))
 
+            request.headerNames.toList().forEach { header ->
+                httpRequest.addHeader(header, request.getHeader(header))
+            }
 
-        val connection = URI(targetUrl).toURL().openConnection() as HttpURLConnection
-        connection.requestMethod = request.method
-        connection.doOutput = true
-        request.headerNames.toList().forEach { header ->
-            connection.setRequestProperty(header, request.getHeader(header))
+            if (request.method in listOf("POST", "PUT", "PATCH")) {
+                val cachedBody = String(wrappedRequest.contentAsByteArray)
+                httpRequest.entity = StringEntity(cachedBody)
+            }
+
+            client.execute(httpRequest) { clientResponse ->
+                response.status = clientResponse.code
+                clientResponse.entity?.content?.use { it.copyTo(response.outputStream) }
+            }
         }
-        if (request.method in listOf("POST", "PUT", "PATCH")) {
-            val cachedBody = String(wrappedRequest.contentAsByteArray)
-            connection.outputStream.use { it.write(cachedBody.toByteArray()) }
-        }
-        response.status = connection.responseCode
-        connection.inputStream.use { it.copyTo(response.outputStream) }
     }
 
 }
