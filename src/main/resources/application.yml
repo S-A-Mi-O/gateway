@@ -9,7 +9,7 @@ spring:
     consumer:
       auto-offset-reset: earliest
   datasource:
-    url: jdbc:postgresql://postgresql_gateway-service:5432/GatewayServiceDB
+    url: jdbc:postgresql://postgresql_gateway:5432/gatewaydb
     username: username
     password: password
   jpa:
