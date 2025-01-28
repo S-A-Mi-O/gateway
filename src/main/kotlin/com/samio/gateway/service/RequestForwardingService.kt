@@ -121,10 +121,6 @@ class RequestForwardingService(
             HttpClients.createDefault().use { client ->
             val httpRequest = HttpUriRequestBase(request.method, URI.create(targetUrl))
 
-            request.headerNames.toList().forEach { header ->
-                httpRequest.addHeader(header, request.getHeader(header))
-            }
-
             if (request.method in listOf("POST", "PUT", "PATCH")) {
                 val cachedBody = String(wrappedRequest.contentAsByteArray)
                 httpRequest.entity = StringEntity(cachedBody)
