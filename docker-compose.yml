@@ -3,19 +3,19 @@ networks:
     driver: bridge
 
 services:
-  gateway-service:
-    image: gateway-service:latest
+  gateway:
+    image: gateway:latest
     build:
       context: .
       dockerfile: Dockerfile
       args:
         GITHUB_USERNAME: ${GITHUB_USERNAME}
         GITHUB_TOKEN: ${GITHUB_TOKEN}
-    container_name: gateway-service
+    container_name: gateway
     ports:
       - "8080:8080"
     environment:
-      GATEWAYSERVICE_DATASOURCE_URL: jdbc:postgresql://postgresql_gateway-service:5432/GatewayServiceDB
+      GATEWAYSERVICE_DATASOURCE_URL: jdbc:postgresql://postgresql_gateway:5432/gatewaydb
       GATEWAYSERVICE_DATASOURCE_USERNAME: username
       GATEWAYSERVICE_DATASOURCE_PASSWORD: password
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
@@ -27,7 +27,7 @@ services:
       - kafka
       - zookeeper
       - redis
-      - postgresql_gateway-service
+      - postgresql_gateway
     networks:
       - microservices-network
     healthcheck:
@@ -67,7 +67,7 @@ services:
     ports:
       - "8081:8081"
     environment:
-      USERSERVICE_DATASOURCE_URL: jdbc:postgresql://postgresql_user-service:5432/UserServiceDB
+      USERSERVICE_DATASOURCE_URL: jdbc:postgresql://postgresql_user-service:5432/userservicedb
       USERSERVICE_DATASOURCE_USERNAME: username
       USERSERVICE_DATASOURCE_PASSWORD: password
       SPRING_DATA_REDIS_HOST: redis
@@ -100,7 +100,7 @@ services:
     ports:
       - "8082:8082"
     environment:
-      PSEUDOPROPERTYSERVICE_DATASOURCE_URL: jdbc:postgresql://postgresql_pseudoproperty-service:5432/PseudopropertyServiceDB
+      PSEUDOPROPERTYSERVICE_DATASOURCE_URL: jdbc:postgresql://postgresql_pseudoproperty-service:5432/pseudoproptertyservicedb
       PSEUDOPROPERTYSERVICE_DATASOURCE_USERNAME: username
       PSEUDOPROPERTYSERVICE_DATASOURCE_PASSWORD: password
       SPRING_DATA_REDIS_HOST: redis
@@ -159,7 +159,7 @@ services:
   postgresql_user-service:
     image: postgres:latest
     environment:
-      POSTGRES_DB: UserServiceDB
+      POSTGRES_DB: userservicedb
       POSTGRES_USER: username
       POSTGRES_PASSWORD: password
     container_name: postgresql_user-service
@@ -176,7 +176,7 @@ services:
   postgresql_pseudoproperty-service:
     image: postgres:latest
     environment:
-      POSTGRES_DB: PseudopropertyServiceDB
+      POSTGRES_DB: pseudopropertyservicedb
       POSTGRES_USER: username
       POSTGRES_PASSWORD: password
     container_name: postgresql_pseudoproperty-service
@@ -190,13 +190,13 @@ services:
       timeout: 10s
       retries: 5
 
-  postgresql_gateway-service:
+  postgresql_gateway:
     image: postgres:latest
     environment:
-      POSTGRES_DB: GatewayServiceDB
+      POSTGRES_DB: gatewaydb
       POSTGRES_USER: username
       POSTGRES_PASSWORD: password
-    container_name: postgresql_gateway-service
+    container_name: postgresql_gateway
     ports:
       - "5433:5432"
     networks:
