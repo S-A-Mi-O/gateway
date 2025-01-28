@@ -1,0 +1,24 @@
+### Authenticate as Existing User
+POST {{ baseUrl }}/auth/login
+Content-Type: application/json
+
+{
+  "username": "firstSuperAdmin",
+  "password": "SuperSecurePassword123!"
+}
+
+> {%
+    client.global.set("token", response.body.accessToken)
+    console.log("Token: " + response.body.accessToken)
+    console.log("Token saved to global variable 'token': " + client.global.get("token"))
+%}
+
+### Authenticate as Guest
+POST {{ baseUrl }}/auth/loginAsGuest
+Content-Type: : application/json
+
+> {%
+    client.global.set("token", response.body.accessToken)
+    console.log("Token: " + response.body.accessToken)
+    console.log("Token saved to global variable 'token': " + client.global.get("token"))
+%}

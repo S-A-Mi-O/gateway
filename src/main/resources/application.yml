@@ -1,0 +1,75 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: gateway-service
+
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      auto-offset-reset: earliest
+  datasource:
+    url: jdbc:postgresql://postgresql_gateway-service:5432/GatewayServiceDB
+    username: username
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+      types:
+        registration: hypersistence-utils
+        json-dialect: true
+    show-sql: false
+    properties:
+      '[hypersistence.utils.enable_types_contributor]': false
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+
+  data:
+    redis:
+      host: redis
+      port: 6379
+
+  profiles:
+    active: default
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-service:8761/eureka/
+
+github:
+  username: ${GITHUB_USERNAME}
+  token: ${GITHUB_TOKEN}
+
+cache:
+  memory:
+    maxSize: 1000000000
+
+security:
+  jwt:
+    secret: Gq9CJs7!wPv58aZL2YxNf6^KmRd3TqBzVUwJhXp4E
+    access:
+      expiration: 900000
+    refresh:
+      expiration: 604800000
+
+logging:
+  level:
+    org.springframework.data: Info
+    org.springframework.context.annotation: WARN
+    org.springframework.boot.autoconfigure: WARN
+    org.apache.kafka: WARN
+    org.springframework.security: TRACE
+    org.springframework.security.web.FilterChainProxy: TRACE
+    org.springframework.web: TRACE
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui
+    display-request-duration: true
+  api-docs:
+    path: /v3/api-docs

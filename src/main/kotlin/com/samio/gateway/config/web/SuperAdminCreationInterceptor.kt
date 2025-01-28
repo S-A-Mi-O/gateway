@@ -1,0 +1,69 @@
+package com.samio.gateway.config.web
+
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.samio.core.controller.abstraction.request.CreateRequest
+import com.samio.gateway.config.exception.AuthenticationFailureException
+import com.samio.gateway.config.security.JwtUtil
+import com.samio.gateway.service._UserRestService
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
+import mu.KotlinLogging
+import org.springframework.stereotype.Component
+import org.springframework.web.servlet.HandlerInterceptor
+import org.springframework.web.util.ContentCachingRequestWrapper
+
+@Component
+class SuperAdminCreationInterceptor(
+    private val _userRestService: _UserRestService,
+    private val jwtUtil: JwtUtil
+) : HandlerInterceptor {
+
+    val log = KotlinLogging.logger {}
+
+    override fun preHandle(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        handler: Any
+    ): Boolean {
+        val wrappedRequest = request as? ContentCachingRequestWrapper
+            ?: throw IllegalStateException("Request must be wrapped with ContentCachingRequestWrapper")
+        val createRequest = try {
+            val requestBody = String(wrappedRequest.contentAsByteArray)
+            ObjectMapper().readValue(requestBody, CreateRequest::class.java)
+        } catch (e: Exception) {
+            log.error { "Error parsing request body: ${e.message}" }
+            return false
+        }
+
+        if (createRequest?.entityClassName != "User") return true
+        else {
+            if (createRequest.properties["userRole"] == "SUPER_ADMIN") {
+                val authHeader = request.getHeader("Authorization")
+                val token = authHeader.removePrefix("Bearer ").trim()
+                val creatorRole = extractRoleFromToken(token)
+                val superAdminCount = _userRestService.getSuperAdminCount()
+                when {
+                    superAdminCount == 0 -> return true
+                    superAdminCount >= 3 ->{
+                        log.error { "Super admin count exceeded" }
+                        return false
+                    }
+                    superAdminCount in 1..2 && creatorRole != "SUPER_ADMIN" -> {
+                        log.error { "Only super admin can create super admin" }
+                        return false
+                    }
+
+                }
+            }
+        }
+        return true
+    }
+
+    private fun extractRoleFromToken(token: String): String {
+        val claims = jwtUtil.getClaimsFromToken(token)
+        val result = claims["role"] as? String
+        println("Role extracted from token: $result")
+        return result
+          ?: throw AuthenticationFailureException()
+    }
+}
