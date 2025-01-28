@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase
 import org.apache.hc.client5.http.impl.classic.HttpClients
+import org.apache.hc.core5.http.ContentType
 import org.apache.hc.core5.http.io.entity.StringEntity
 import org.springframework.cloud.client.discovery.DiscoveryClient
 import org.springframework.stereotype.Service
@@ -118,18 +119,22 @@ class RequestForwardingService(
         val wrappedRequest = request as? ContentCachingRequestWrapper
             ?: throw IllegalStateException("Request must be wrapped with ContentCachingRequestWrapper")
 
+        try {
             HttpClients.createDefault().use { client ->
-            val httpRequest = HttpUriRequestBase(request.method, URI.create(targetUrl))
+                val httpRequest = HttpUriRequestBase(request.method, URI.create(targetUrl))
 
-            if (request.method in listOf("POST", "PUT", "PATCH")) {
-                val cachedBody = String(wrappedRequest.contentAsByteArray)
-                httpRequest.entity = StringEntity(cachedBody)
-            }
+                if (request.method in listOf("POST", "PUT", "PATCH")) {
+                    val cachedBody = String(wrappedRequest.contentAsByteArray)
+                    httpRequest.entity = StringEntity(cachedBody, ContentType.APPLICATION_JSON)
+                }
 
-            client.execute(httpRequest) { clientResponse ->
-                response.status = clientResponse.code
-                clientResponse.entity?.content?.use { it.copyTo(response.outputStream) }
+                client.execute(httpRequest) { clientResponse ->
+                    response.status = clientResponse.code
+                    clientResponse.entity?.content?.use { it.copyTo(response.outputStream) }
+                }
             }
+        } catch (e: Exception) {
+            log.error { "RequestForwardingService::proxyRequest threw an exception: ${e.message}" }
         }
     }
 
