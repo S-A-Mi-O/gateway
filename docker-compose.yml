@@ -168,7 +168,7 @@ services:
     networks:
       - microservices-network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${USERSERVICE_DATASOURCE_USERNAME} -d UserServiceDB || exit 1" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${USERSERVICE_DATASOURCE_USERNAME} -d userservicedb || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -185,7 +185,7 @@ services:
     networks:
       - microservices-network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${PSEUDOPROPERTYSERVICE_DATASOURCE_USERNAME} -d PseudopropertyServiceDB || exit 1" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${PSEUDOPROPERTYSERVICE_DATASOURCE_USERNAME} -d propertyservicedb || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -202,7 +202,7 @@ services:
     networks:
       - microservices-network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${GATEWAYSERVICE_DATASOURCE_USERNAME} -d GatewayServiceDB || exit 1" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${GATEWAYSERVICE_DATASOURCE_USERNAME} -d gatewaydb || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 5
