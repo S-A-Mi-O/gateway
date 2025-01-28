@@ -109,7 +109,7 @@ class SuperAdminCreationInterceptorTest {
         val response = mock(HttpServletResponse::class.java)
         val token = "valid.token"
         val claims = mock(Claims::class.java)
-
+        `when`(request.method).thenReturn("POST")
         `when`(request.contentAsByteArray).thenReturn(
             """{
                 "entityClassName":"User",
