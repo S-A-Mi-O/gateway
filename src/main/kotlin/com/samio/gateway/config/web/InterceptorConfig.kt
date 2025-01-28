@@ -20,10 +20,33 @@ class InterceptorConfig : WebMvcConfigurer {
 
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(activityInterceptor)
-            .excludePathPatterns("/auth/**")
+            .excludePathPatterns(
+                "/auth/**",
+                "/favicon.ico",
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/swagger-resources/**",
+                "/webjars/**"
+            )
+
         registry.addInterceptor(rateLimitingInterceptor)
-            .excludePathPatterns("/auth/**")
+            .excludePathPatterns(
+                "/auth/**",
+                "/favicon.ico",
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/swagger-resources/**",
+                "/webjars/**"
+            )
+
         registry.addInterceptor(superAdminInterceptor)
-            .excludePathPatterns("/auth/**")
+            .excludePathPatterns(
+                "/auth/**",
+                "/favicon.ico",
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/swagger-resources/**",
+                "/webjars/**"
+            )
     }
 }
