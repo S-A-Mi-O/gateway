@@ -1,6 +1,8 @@
 ### Create user
-POST http://localhost:8080/users
+POST http://localhost:8080/user-service/users
 Content-Type: application/json
+Authorization: Bearer {{token}}
+
 
 {
   "entityClassName": "User",
@@ -12,25 +14,33 @@ Content-Type: application/json
       "email": "mail@mail.com",
       "firstName": "Aron",
       "lastName": "Vaupel"
-    },
-    "pseudoProperties": {
-      "dateOfBirth": "2024-12-20"
     }
   }
 }
+
+> {%
+    console.log(request.headers);
+    console.log(response.body);
+%}
 
 ### Update user
 PATCH http://localhost:8080/users
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
-  "id": "bfc7f1a2-8283-4729-a535-25ab23016257",
+  "id": "aea9277a-7b88-481b-a58f-a1dac0121ce3",
   "properties": {
     "pseudoProperties": {
-      "birthday": "2024-12-30"
+      "dateOfBirth": "2024-12-30"
     }
   }
 }
+
+> {%
+    console.log(request.headers);
+    console.log(response.body);
+%}
 
 ### Update user with complex pseudoProperty
 PATCH http://localhost:8080/users

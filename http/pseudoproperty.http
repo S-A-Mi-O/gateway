@@ -1,6 +1,7 @@
 ### Create simple pseudoProperty
-POST http://localhost:8080/pseudo-properties
+POST http://localhost:8080/pseudoproperty-service/pseudo-properties
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "entityClassName": "PseudoProperty",
@@ -14,6 +15,11 @@ Content-Type: application/json
     }
   }
 }
+
+> {%
+    console.log(request.headers);
+    console.log(response.body);
+%}
 
 ### Create complex pseudoProperty
 POST http://localhost:8080/pseudo-properties
