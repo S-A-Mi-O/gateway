@@ -25,6 +25,7 @@ class SuperAdminCreationInterceptor(
         response: HttpServletResponse,
         handler: Any
     ): Boolean {
+        if (request.method != "POST") return true
         val wrappedRequest = request as? ContentCachingRequestWrapper
             ?: throw IllegalStateException("Request must be wrapped with ContentCachingRequestWrapper")
         val createRequest = try {
