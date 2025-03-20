@@ -100,7 +100,7 @@ services:
     ports:
       - "8082:8082"
     environment:
-      PSEUDOPROPERTYSERVICE_DATASOURCE_URL: jdbc:postgresql://postgresql_pseudoproperty-service:5432/pseudoproptertyservicedb
+      PSEUDOPROPERTYSERVICE_DATASOURCE_URL: jdbc:postgresql://postgresql_pseudoproperty-service:5432/pseudopropertyservicedb
       PSEUDOPROPERTYSERVICE_DATASOURCE_USERNAME: username
       PSEUDOPROPERTYSERVICE_DATASOURCE_PASSWORD: password
       SPRING_DATA_REDIS_HOST: redis
@@ -185,7 +185,7 @@ services:
     networks:
       - microservices-network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${PSEUDOPROPERTYSERVICE_DATASOURCE_USERNAME} -d propertyservicedb || exit 1" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${PSEUDOPROPERTYSERVICE_DATASOURCE_USERNAME} -d pseudopropertyservicedb || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 5
